@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#241A5C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mocho">
+  <meta name="description" content="Treina cálculo mental com o Mocho: somar, subtrair, multiplicar e dividir.">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Contas do Mocho</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="sky" aria-hidden="true"><div class="moon"></div></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <main>
+    <!-- ===== MENU ===== -->
+    <section id="home" class="screen active" aria-label="Menu">
+      <header class="topbar">
+        <button class="icon-btn" id="soundBtn" aria-label="Sons">🔊</button>
+        <button class="icon-btn" id="musicBtn" aria-label="Música">🎵</button>
+      </header>
+
+      <div class="hero">
+        <button class="owl-wrap" id="owlHome" aria-label="Mocho: toca para um truque"></button>
+        <div class="bubble" id="bubbleHome" role="status" aria-live="polite"></div>
+      </div>
+
+      <h1 class="title">Contas do Mocho</h1>
+
+      <div class="ops" role="radiogroup" aria-label="Escolhe a conta">
+        <button class="op-tile" data-op="add" role="radio" aria-checked="true"><span class="badge">+</span><span class="label">Somar</span></button>
+        <button class="op-tile" data-op="sub" role="radio" aria-checked="false"><span class="badge">−</span><span class="label">Subtrair</span></button>
+        <button class="op-tile" data-op="mul" role="radio" aria-checked="false"><span class="badge">×</span><span class="label">Multiplicar</span></button>
+        <button class="op-tile" data-op="div" role="radio" aria-checked="false"><span class="badge">÷</span><span class="label">Dividir</span></button>
+        <button class="op-tile wide" data-op="mix" role="radio" aria-checked="false"><span class="badge">🎲</span><span class="label">Tudo misturado</span></button>
+      </div>
+
+      <div class="levels" role="radiogroup" aria-label="Escolhe o nível">
+        <button class="level" data-lvl="easy" role="radio" aria-checked="true">🐣<span>Fácil</span></button>
+        <button class="level" data-lvl="medium" role="radio" aria-checked="false">🦉<span>Médio</span></button>
+        <button class="level" data-lvl="hard" role="radio" aria-checked="false">🚀<span>Difícil</span></button>
+      </div>
+
+      <p class="best" id="bestHome"></p>
+      <button class="play-btn" id="playBtn">Jogar</button>
+    </section>
+
+    <!-- ===== JOGO ===== -->
+    <section id="game" class="screen" aria-label="Jogo">
+      <header class="topbar">
+        <button class="icon-btn" id="quitBtn" aria-label="Voltar ao menu">✕</button>
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+        <div class="score-pill" aria-label="Pontos">⭐ <span id="score">0</span></div>
+      </header>
+
+      <div class="helper">
+        <button class="owl-wrap small" id="owlGame" aria-label="Mocho: toca para um truque"></button>
+        <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="card" id="card">
+        <div class="streak" id="streak" aria-live="polite"></div>
+        <div class="count" id="count">1 / 10</div>
+        <div class="question" id="question"></div>
+        <div class="answer" id="answer">?</div>
+      </div>
+
+      <div class="tools">
+        <button class="tool-btn hint" id="hintBtn">💡 Dica</button>
+        <button class="tool-btn ask" id="askBtn">💬 Perguntar ao Claude</button>
+      </div>
+
+      <div class="pad" id="pad">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="del" class="del" aria-label="Apagar">⌫</button>
+        <button data-k="0">0</button>
+        <button data-k="ok" class="ok" id="okKey" aria-label="Confirmar">✓</button>
+      </div>
+    </section>
+
+    <!-- ===== FIM ===== -->
+    <section id="end" class="screen" aria-label="Resultado">
+      <div class="end-box">
+        <div class="owl-wrap" id="owlEnd"></div>
+        <div class="stars" id="stars" aria-label="Estrelas"><span>★</span><span>★</span><span>★</span></div>
+        <h2 class="end-title" id="endTitle"></h2>
+        <div class="end-score"><span id="endScore">0</span> pontos</div>
+        <p class="end-stats" id="endStats"></p>
+        <p class="record" id="record"></p>
+        <div class="end-actions">
+          <button class="play-btn" id="againBtn">Jogar outra vez</button>
+          <button class="ghost-btn" id="menuBtn">Menu</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
