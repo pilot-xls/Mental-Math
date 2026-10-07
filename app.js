@@ -554,7 +554,15 @@ function init() {
   $('#hintBtn').addEventListener('click', showHint);
   $('#askBtn').addEventListener('click', askClaude);
 
-  $('#pad').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) press(b.dataset.k); });
+  // pointerdown em vez de click: o iOS ignora toques rápidos seguidos (trata-os como duplo toque)
+  $('#pad').addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.preventDefault();
+    press(b.dataset.k);
+    b.classList.add('pressed'); setTimeout(() => b.classList.remove('pressed'), 100);
+  });
+  // click só para teclado/leitor de ecrã (detail === 0); toques já foram tratados acima
+  $('#pad').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && e.detail === 0) press(b.dataset.k); });
 
   document.addEventListener('keydown', (e) => {
     if (!$('#game').classList.contains('active')) return;
