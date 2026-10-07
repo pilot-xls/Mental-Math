@@ -12,17 +12,16 @@
   --op: var(--add);
   --font: "Fredoka", "Arial Rounded MT Bold", "Nunito", system-ui, -apple-system, sans-serif;
   box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 *, *::before, *::after { box-sizing: inherit; }
 
 html, body { height: 100%; margin: 0; }
+html { background: var(--sky-bottom); }
 body {
+  height: 100dvh;
   font-family: var(--font);
   color: var(--cream);
-  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 70%);
-  background-attachment: fixed;
+  background: var(--sky-bottom);
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
@@ -33,7 +32,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
 /* ---------- Céu ---------- */
-#sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+#sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 70%); }
 .star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--cream); opacity: .7; animation: twinkle 3s ease-in-out infinite; }
 .moon { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 72px); right: -50px; width: 110px; height: 110px; border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #FFF3C4, #FFD56B 70%); box-shadow: 0 0 60px rgba(255, 213, 107, .35); opacity: .9; }
@@ -41,7 +41,8 @@ button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
 #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 
-main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0 auto; }
+main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0 auto;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 
 .screen { display: none; height: 100%; flex-direction: column; padding: 8px 16px 12px; }
 .screen.active { display: flex; animation: screenIn .35s ease-out; }
