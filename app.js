@@ -20,6 +20,7 @@ const OPS = {
   sub: { sym: '−', name: 'Subtrair', color: 'var(--sub)' },
   mul: { sym: '×', name: 'Multiplicar', color: 'var(--mul)' },
   div: { sym: '÷', name: 'Dividir', color: 'var(--div)' },
+  pct: { sym: '%', name: 'Percentagens', color: 'var(--pct)' },
   mix: { sym: '🎲', name: 'Tudo misturado', color: 'var(--mix)' }
 };
 const LEVELS = { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' };
@@ -156,8 +157,15 @@ const audio = {
 };
 
 /* ---------------- Perguntas ---------------- */
+// Percentagens: para cada %, de quanto em quanto pode ir o número, para que a resposta e os passos das dicas deem inteiros
+const PCT = {
+  easy: { lo: 20, hi: 100, step: { 10: 10, 25: 4, 50: 2 } },
+  medium: { lo: 20, hi: 200, step: { 5: 20, 20: 10, 30: 10, 40: 10, 60: 10, 70: 10, 75: 4, 80: 10, 90: 10 } },
+  hard: { lo: 40, hi: 600, step: { 12: 100, 15: 20, 35: 20, 45: 20, 65: 20, 95: 20, 120: 10, 150: 2 } }
+};
+
 function makeQuestion(op, lvl) {
-  if (op === 'mix') op = pick(['add', 'sub', 'mul', 'div']);
+  if (op === 'mix') op = pick(['add', 'sub', 'mul', 'div', 'pct']);
   let a, b, ans;
   if (op === 'add') {
     if (lvl === 'easy') { a = rnd(3, 19); b = rnd(2, 9); }
@@ -175,6 +183,12 @@ function makeQuestion(op, lvl) {
     else { a = rnd(13, 39); b = rnd(11, 19); }
     if (Math.random() < 0.5) [a, b] = [b, a];
     ans = a * b;
+  } else if (op === 'pct') {
+    const { lo, hi, step } = PCT[lvl];
+    a = Number(pick(Object.keys(step)));
+    const u = step[a];
+    b = u * rnd(Math.ceil(lo / u), Math.floor(hi / u));
+    ans = (a * b) / 100;
   } else {
     if (lvl === 'easy') { b = rnd(2, 9); ans = rnd(2, 10); }
     else if (lvl === 'medium') { b = rnd(3, 9); ans = rnd(11, 49); }
@@ -184,7 +198,7 @@ function makeQuestion(op, lvl) {
   return { op, a, b, ans, lvl };
 }
 
-const qText = (q) => `${q.a} ${OPS[q.op].sym} ${q.b}`;
+const qText = (q) => (q.op === 'pct' ? `${q.a}% de ${q.b}` : `${q.a} ${OPS[q.op].sym} ${q.b}`);
 
 /* ---------------- Dicas passo a passo ---------------- */
 const parts = (n) => { const s = String(n); return [...s].map((d, i) => +d * 10 ** (s.length - 1 - i)).filter((x) => x > 0); };
@@ -202,8 +216,70 @@ function mulLine(o, p) {
   return `${o} × ${p} = <b>${o * p}</b>`;
 }
 
+// metade aos bocados: 96 = 90 + 6 ➜ 45 + 3
+function halfLine(n) {
+  const p = parts(n);
+  return `metade de ${n} = ${p.length > 1 ? p.map((x) => x / 2).join(' + ') + ' = ' : ''}<b>${n / 2}</b>`;
+}
+
+function pctHints(p, n) {
+  const s = [], d10 = n / 10;
+  if (p === 10) {
+    s.push(`10% é a décima parte: ${n} ÷ 10.`);
+    s.push(`Dividir por 10 é tirar o 0 do fim do ${n}.`);
+  } else if (p === 50) {
+    s.push(`50% é metade: ${n} ÷ 2.`);
+    const ps = parts(n);
+    if (ps.length > 1) {
+      s.push(`Parte o ${n} em ${ps.join(' + ')} e tira metade a cada bocado.`);
+      s.push(`Agora soma as metades: ${ps.map((x) => x / 2).join(' + ')}.`);
+    } else s.push(`Que número somado com ele próprio dá ${n}?`);
+  } else if (p === 25) {
+    s.push(`25% é metade da metade.`);
+    s.push(`50% = ${halfLine(n)}`);
+    s.push(`Agora a metade de ${n / 2}.`);
+  } else if (p === 75) {
+    s.push(`75% = 50% + 25%: metade, mais metade da metade.`);
+    s.push(`50% = ${halfLine(n)}`);
+    s.push(`25% = ${halfLine(n / 2)}`);
+    s.push(`Agora soma: ${n / 2} + ${n / 4}.`);
+  } else if (p === 150) {
+    s.push(`150% = 100% + 50%: o número todo, mais metade.`);
+    s.push(`50% = ${halfLine(n)}`);
+    s.push(`Agora soma: ${n} + ${n / 2}.`);
+  } else if (p === 12) {
+    s.push(`12% = 10% + 1% + 1%.`);
+    s.push(`10% de ${n} = ${n} ÷ 10 = <b>${d10}</b>`);
+    s.push(`1% de ${n} = ${n} ÷ 100 = <b>${n / 100}</b>, por isso 2% = <b>${n / 50}</b>`);
+    s.push(`Agora soma: ${d10} + ${n / 50}.`);
+  } else if (p === 120) {
+    s.push(`120% = 100% + 20%: o número todo, mais um bocadinho.`);
+    s.push(`10% de ${n} = ${n} ÷ 10 = <b>${d10}</b>, por isso 20% = <b>${d10 * 2}</b>`);
+    s.push(`Agora soma: ${n} + ${d10 * 2}.`);
+  } else if (p % 10 === 0) {
+    const k = p / 10;
+    s.push(`${p}% = ${k} × 10%.`);
+    s.push(`10% de ${n} = ${n} ÷ 10 = <b>${d10}</b>`);
+    s.push(k === 2 ? `Agora o dobro de ${d10}.` : `Agora multiplica: ${k} × ${d10}.`);
+    if (p === 90) s.push(`Outra forma: 90% = 100% − 10%, ou seja ${n} − ${d10}.`);
+  } else {
+    // 5, 15, 35, 45, 65, 95: tudo a partir dos 10%, e 5% é metade de 10%
+    const t = p - 5, k = t / 10;
+    s.push(p === 5 ? `5% é metade de 10%.` : p === 95 ? `95% = 100% − 5%: o número todo, menos um bocadinho.` : `${p}% = ${t}% + 5%, e 5% é metade de 10%.`);
+    s.push(`10% de ${n} = ${n} ÷ 10 = <b>${d10}</b>`);
+    if (p === 5) s.push(`Agora a metade de ${d10}.`);
+    else {
+      if (k > 1 && p !== 95) s.push(`${t}% = ${k} × 10% = <b>${k * d10}</b>`);
+      s.push(`5% = metade de ${d10} = <b>${d10 / 2}</b>`);
+      s.push(p === 95 ? `Agora tira: ${n} − ${d10 / 2}.` : `Agora soma: ${k * d10} + ${d10 / 2}.`);
+    }
+  }
+  return s;
+}
+
 function hintsFor(q) {
   const { a, b } = q;
+  if (q.op === 'pct') return pctHints(a, b);
   const s = [];
   if (q.op === 'add') {
     if (b < 10) {
@@ -299,7 +375,8 @@ const TRICKS = {
   add: ['Arredonda e compensa: 48 + 27 = 50 + 27 − 2.', 'Soma primeiro as dezenas, depois as unidades.', 'Completa a dezena: 8 + 5 = 8 + 2 + 3.'],
   sub: ['Conta para cima: 83 − 47 é quanto falta do 47 até ao 83.', 'Arredonda: 62 − 29 = 62 − 30 + 1.', 'Tira aos bocados: primeiro as dezenas, depois as unidades.'],
   mul: ['×5 = ×10 e depois metade.', '×9 = ×10 menos uma vez.', '×4 é o dobro do dobro.', 'Parte em dezenas: 7 × 23 = 7×20 + 7×3.'],
-  div: ['Pergunta "quantas vezes cabe?": 7 × ? = 300.', '÷5 = ×2 e depois ÷10.', '÷4 é a metade da metade.', 'Tira blocos redondos: 7 × 40 = 280, sobram 20.']
+  div: ['Pergunta "quantas vezes cabe?": 7 × ? = 300.', '÷5 = ×2 e depois ÷10.', '÷4 é a metade da metade.', 'Tira blocos redondos: 7 × 40 = 280, sobram 20.'],
+  pct: ['10% é dividir por 10: 10% de 70 = 7.', '50% é metade e 25% é metade da metade.', '5% é metade de 10%: 5% de 80 = 4.', '15% = 10% + 5%: 15% de 60 = 6 + 3.', 'Podes trocar os números: 8% de 50 = 50% de 8 = 4.']
 };
 const randomTrick = (op) => `<span class="tag">Truque</span><br>${pick(TRICKS[op === 'mix' || !TRICKS[op] ? pick(Object.keys(TRICKS)) : op])}`;
 
@@ -344,7 +421,9 @@ function nextQuestion(first) {
   g.qid = (g.qid || 0) + 1;
   const q = g.q;
   if (state.op === 'mix') document.documentElement.style.setProperty('--op', OPS[q.op].color);
-  $('#question').innerHTML = `${q.a}<span class="sym">${OPS[q.op].sym}</span>${q.b}`;
+  $('#question').innerHTML = q.op === 'pct'
+    ? `${q.a}<span class="sym pct">%</span><span class="of">de</span>${q.b}`
+    : `${q.a}<span class="sym">${OPS[q.op].sym}</span>${q.b}`;
   $('#count').textContent = `${g.i + 1} / ${ROUND}`;
   $('#bar').style.width = `${(g.i / ROUND) * 100}%`;
   const okKey = $('#okKey');
@@ -417,7 +496,8 @@ function submit() {
       g.input = String(q.ans);
       renderAnswer('solution');
       const steps = hintsFor(q);
-      const key = steps.find((x) => x.startsWith('Bloco')) || steps[Math.min(1, steps.length - 1)];
+      // nas percentagens o 1.º passo é a regra (ex.: "25% é metade da metade")
+      const key = steps.find((x) => x.startsWith('Bloco')) || steps[q.op === 'pct' ? 0 : Math.min(1, steps.length - 1)];
       say($('#bubble'), `A resposta é <b>${q.ans}</b>. Lembra-te: ${key}<br>Toca em ➜ para continuar.`);
       g.i++;
       g.waiting = true;

@@ -8,6 +8,7 @@
   --mul: #FFC93C;
   --div: #4CC9F0;
   --mix: #FF8FD8;
+  --pct: #FF9F43;
   --orange: #FF9F1C;
   --op: var(--add);
   --font: "Fredoka", "Arial Rounded MT Bold", "Nunito", system-ui, -apple-system, sans-serif;
@@ -44,7 +45,7 @@ button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0 auto;
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 
-.screen { display: none; height: 100%; flex-direction: column; padding: 8px 16px 12px; }
+.screen { display: none; height: 100%; flex-direction: column; padding: 8px 16px 12px; overflow-y: auto; overscroll-behavior: contain; }
 .screen.active { display: flex; animation: screenIn .35s ease-out; }
 @keyframes screenIn { from { opacity: 0; transform: scale(.97); } }
 
@@ -101,12 +102,14 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
 .op-tile[data-op="sub"] { --c: var(--sub); }
 .op-tile[data-op="mul"] { --c: var(--mul); }
 .op-tile[data-op="div"] { --c: var(--div); }
+.op-tile[data-op="pct"] { --c: var(--pct); }
 .op-tile[data-op="mix"] { --c: var(--mix); }
-.op-tile.wide { grid-column: 1 / -1; justify-content: center; }
 .op-tile .badge { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: var(--ink);
   font-size: 38px; font-weight: 700; line-height: 1; box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); }
-.op-tile.wide .badge { font-size: 28px; }
+.op-tile[data-op="pct"] .badge { font-size: 30px; }
+.op-tile[data-op="mix"] .badge { font-size: 28px; }
 .op-tile .label { font-size: clamp(15px, 4.2vw, 18px); font-weight: 600; white-space: nowrap; }
+.op-tile[data-op="pct"] .label { font-size: clamp(12px, 3.7vw, 17px); letter-spacing: -.2px; } /* "Percentagens" é comprido */
 .op-tile[aria-checked="true"] { background: rgba(255,255,255,.22); border-color: var(--c); transform: translateY(-2px); }
 .op-tile[aria-checked="true"] .badge { animation: wiggle .4s ease-in-out; }
 .op-tile:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
@@ -146,6 +149,8 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
 .streak.hot { animation: pop .3s ease-out; }
 .question { font-size: clamp(38px, 12vw, 54px); font-weight: 700; line-height: 1.1; white-space: nowrap; }
 .question .sym { color: var(--op); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; margin: 0 .12em; }
+.question .sym.pct { margin: 0 0 0 .04em; }
+.question .of { font-size: .5em; margin: 0 .3em; opacity: .6; }
 .answer { margin: 10px auto 0; min-width: 120px; display: inline-block; padding: 6px 20px; border-radius: 18px; background: rgba(30,27,75,.08);
   font-size: clamp(34px, 10vw, 46px); font-weight: 700; line-height: 1.2; min-height: 1.2em; }
 .answer.empty { color: rgba(30,27,75,.3); }
@@ -169,8 +174,7 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
 .pad .ok.next { background: var(--div); box-shadow: 0 5px 0 #1C8CB0; }
 
 /* ---------- Fim ---------- */
-#end { justify-content: center; }
-.end-box { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.end-box { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; margin: auto 0; }
 .stars { display: flex; gap: 6px; font-size: 54px; line-height: 1; margin-top: 4px; }
 .stars span { color: rgba(255,255,255,.18); transform: scale(.6); transition: transform .3s; }
 .stars span.on { color: var(--mul); text-shadow: 0 4px 0 #C98F00; animation: starIn .5s ease-out both; transform: scale(1); }
@@ -192,15 +196,49 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
   transition: transform .3s ease-out, opacity .3s; max-width: 90vw; text-align: center; opacity: 0; visibility: hidden; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 
-/* Ecrãs baixos (iPhone SE) */
+/* Ecrãs baixos (iPhone SE, Safari com barras) */
 @media (max-height: 700px) {
-  .owl-wrap { width: 110px; height: 110px; }
+  .owl-wrap { width: 90px; height: 90px; }
   .owl-wrap.small { width: 64px; height: 64px; }
   .helper { min-height: 64px; }
-  .title { margin: 8px 0; }
-  .op-tile .badge { width: 44px; height: 44px; font-size: 32px; }
+  .bubble { padding: 10px 12px; }
+  .title { margin: 6px 0; }
+  .ops { gap: 8px; }
+  .op-tile { padding: 6px; }
+  .op-tile .badge { width: 42px; height: 42px; font-size: 32px; }
+  .levels { margin-top: 8px; }
+  .level { padding: 4px; }
+  .best { margin: 4px 0; }
+  .play-btn { padding: 12px; }
   .card { padding: 22px 14px 14px; }
   .tools { margin: 10px 0 8px; }
+}
+
+/* Ecrãs muito baixos (iPhone SE no Safari, SE 1.ª geração) */
+@media (max-height: 600px) {
+  #home { position: relative; }
+  #home .topbar { position: absolute; top: 8px; right: 16px; z-index: 2; }
+  .hero { margin-top: 0; }
+  #owlHome { width: 68px; height: 68px; }
+  .bubble, .helper .bubble { padding: 8px 12px; font-size: 14px; }
+  .title { font-size: 28px; margin: 6px 0; }
+  .level { font-size: 20px; }
+  .card { padding: 18px 12px 12px; }
+  .answer { margin-top: 6px; }
+  .tools { margin: 6px 0; }
+  .pad button { height: clamp(44px, 8.5vh, 66px); }
+}
+
+/* Ecrãs estreitos (320 px): os rótulos dos mosaicos têm de caber */
+@media (max-width: 359px) {
+  .screen { padding-left: 12px; padding-right: 12px; }
+  #home .topbar { right: 12px; }
+  .ops { gap: 8px; }
+  .op-tile { padding: 6px; gap: 6px; }
+  .op-tile .badge { width: 38px; height: 38px; font-size: 28px; }
+  .op-tile[data-op="pct"] .badge, .op-tile[data-op="mix"] .badge { font-size: 22px; }
+  .op-tile .label { font-size: 14px; }
+  .op-tile[data-op="pct"] .label { font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
