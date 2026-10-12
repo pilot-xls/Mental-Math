@@ -1,5 +1,5 @@
 // Muda a versão sempre que alterares ficheiros, para o iPhone buscar a versão nova.
-const CACHE = 'mocho-v5';
+const CACHE = 'mocho-v6';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'
