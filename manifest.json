@@ -1,7 +1,7 @@
 {
   "name": "Contas do Mocho",
   "short_name": "Mocho",
-  "description": "Treina cálculo mental com o Mocho: somar, subtrair, multiplicar e dividir.",
+  "description": "Treina cálculo mental com o Mocho: somar, subtrair, multiplicar, dividir e percentagens.",
   "lang": "pt-PT",
   "start_url": "./",
   "scope": "./",

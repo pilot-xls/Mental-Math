@@ -1,6 +1,6 @@
 # Contas do Mocho 🦉
 
-Jogo de cálculo mental (PWA) para iPhone: somar, subtrair, multiplicar e dividir, com 3 níveis, dicas passo a passo do Mocho, sons e música.
+Jogo de cálculo mental (PWA) para iPhone: somar, subtrair, multiplicar, dividir e percentagens, com 3 níveis, dicas passo a passo do Mocho, sons e música.
 
 ## Publicar no GitHub Pages
 

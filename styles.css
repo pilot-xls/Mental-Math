@@ -8,6 +8,7 @@
   --mul: #FFC93C;
   --div: #4CC9F0;
   --mix: #FF8FD8;
+  --pct: #FF9F43;
   --orange: #FF9F1C;
   --op: var(--add);
   --font: "Fredoka", "Arial Rounded MT Bold", "Nunito", system-ui, -apple-system, sans-serif;
@@ -101,12 +102,14 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
 .op-tile[data-op="sub"] { --c: var(--sub); }
 .op-tile[data-op="mul"] { --c: var(--mul); }
 .op-tile[data-op="div"] { --c: var(--div); }
+.op-tile[data-op="pct"] { --c: var(--pct); }
 .op-tile[data-op="mix"] { --c: var(--mix); }
-.op-tile.wide { grid-column: 1 / -1; justify-content: center; }
 .op-tile .badge { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: var(--ink);
   font-size: 38px; font-weight: 700; line-height: 1; box-shadow: inset 0 -5px 0 rgba(0,0,0,.18); }
-.op-tile.wide .badge { font-size: 28px; }
+.op-tile[data-op="pct"] .badge { font-size: 30px; }
+.op-tile[data-op="mix"] .badge { font-size: 28px; }
 .op-tile .label { font-size: clamp(15px, 4.2vw, 18px); font-weight: 600; white-space: nowrap; }
+.op-tile[data-op="pct"] .label { font-size: clamp(12px, 3.7vw, 17px); letter-spacing: -.2px; } /* "Percentagens" é comprido */
 .op-tile[aria-checked="true"] { background: rgba(255,255,255,.22); border-color: var(--c); transform: translateY(-2px); }
 .op-tile[aria-checked="true"] .badge { animation: wiggle .4s ease-in-out; }
 .op-tile:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
@@ -146,6 +149,8 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
 .streak.hot { animation: pop .3s ease-out; }
 .question { font-size: clamp(38px, 12vw, 54px); font-weight: 700; line-height: 1.1; white-space: nowrap; }
 .question .sym { color: var(--op); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; margin: 0 .12em; }
+.question .sym.pct { margin: 0 0 0 .04em; }
+.question .of { font-size: .5em; margin: 0 .3em; opacity: .6; }
 .answer { margin: 10px auto 0; min-width: 120px; display: inline-block; padding: 6px 20px; border-radius: 18px; background: rgba(30,27,75,.08);
   font-size: clamp(34px, 10vw, 46px); font-weight: 700; line-height: 1.2; min-height: 1.2em; }
 .answer.empty { color: rgba(30,27,75,.3); }
