@@ -196,38 +196,37 @@ main { position: relative; z-index: 1; height: 100%; max-width: 480px; margin: 0
   transition: transform .3s ease-out, opacity .3s; max-width: 90vw; text-align: center; opacity: 0; visibility: hidden; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 
-/* Ecrãs baixos (iPhone SE, Safari com barras) */
-@media (max-height: 700px) {
-  .owl-wrap { width: 90px; height: 90px; }
-  .owl-wrap.small { width: 64px; height: 64px; }
-  .helper { min-height: 64px; }
-  .bubble { padding: 10px 12px; }
-  .title { margin: 6px 0; }
-  .ops { gap: 8px; }
-  .op-tile { padding: 6px; }
-  .op-tile .badge { width: 42px; height: 42px; font-size: 32px; }
-  .levels { margin-top: 8px; }
-  .level { padding: 4px; }
-  .best { margin: 4px 0; }
-  .play-btn { padding: 12px; }
-  .card { padding: 22px 14px 14px; }
-  .tools { margin: 10px 0 8px; }
-}
+/* Ecrãs baixos: o app.js mede o ecrã ativo (já sem barra de estado/notch nem barra de início)
+   e junta degraus ao <html> até caber — snug ➜ short ➜ tiny. :where() não soma especificidade. */
+:where(.snug) .owl-wrap { width: 120px; height: 120px; }
+:where(.snug) .title { margin: 10px 0 8px; }
 
-/* Ecrãs muito baixos (iPhone SE no Safari, SE 1.ª geração) */
-@media (max-height: 600px) {
-  #home { position: relative; }
-  #home .topbar { position: absolute; top: 8px; right: 16px; z-index: 2; }
-  .hero { margin-top: 0; }
-  #owlHome { width: 68px; height: 68px; }
-  .bubble, .helper .bubble { padding: 8px 12px; font-size: 14px; }
-  .title { font-size: 28px; margin: 6px 0; }
-  .level { font-size: 20px; }
-  .card { padding: 18px 12px 12px; }
-  .answer { margin-top: 6px; }
-  .tools { margin: 6px 0; }
-  .pad button { height: clamp(44px, 8.5vh, 66px); }
-}
+:where(.short) .owl-wrap { width: 90px; height: 90px; }
+:where(.short) .owl-wrap.small { width: 64px; height: 64px; }
+:where(.short) .helper { min-height: 64px; }
+:where(.short) .bubble { padding: 10px 12px; }
+:where(.short) .title { margin: 6px 0; }
+:where(.short) .ops { gap: 8px; }
+:where(.short) .op-tile { padding: 6px; }
+:where(.short) .op-tile .badge { width: 42px; height: 42px; font-size: 32px; }
+:where(.short) .levels { margin-top: 8px; }
+:where(.short) .level { padding: 4px; }
+:where(.short) .best { margin: 4px 0; }
+:where(.short) .play-btn { padding: 12px; }
+:where(.short) .card { padding: 22px 14px 14px; }
+:where(.short) .tools { margin: 10px 0 8px; }
+
+:where(.tiny) #home { position: relative; }
+:where(.tiny) #home .topbar { position: absolute; top: 8px; right: 16px; z-index: 2; }
+:where(.tiny) .hero { margin-top: 0; }
+:where(.tiny) #owlHome { width: 68px; height: 68px; }
+:where(.tiny) .bubble, :where(.tiny) .helper .bubble { padding: 8px 12px; font-size: 14px; }
+:where(.tiny) .title { font-size: 28px; margin: 6px 0; }
+:where(.tiny) .level { font-size: 20px; }
+:where(.tiny) .card { padding: 18px 12px 12px; }
+:where(.tiny) .answer { margin-top: 6px; }
+:where(.tiny) .tools { margin: 6px 0; }
+:where(.tiny) .pad button { height: clamp(44px, 8.5vh, 66px); }
 
 /* Ecrãs estreitos (320 px): os rótulos dos mosaicos têm de caber */
 @media (max-width: 359px) {

@@ -69,6 +69,21 @@ function say(el, html) {
   el.classList.remove('pop');
   void el.offsetWidth;
   el.classList.add('pop');
+  if (el.closest('.screen.active')) fit(true); // texto mais comprido pode deixar de caber
+}
+
+/* ---------------- Encaixe no ecrã ---------------- */
+// As media queries de altura não descontam a barra de estado nem a barra de início do iPhone,
+// por isso mede-se o ecrã ativo e compacta-se por degraus (ver styles.css) até caber.
+const FIT = ['snug', 'short', 'tiny'];
+function fit(grow) {
+  const root = document.documentElement, s = $('.screen.active');
+  if (!s) return;
+  if (!grow) root.classList.remove(...FIT); // grow: só encolhe, para o layout não saltar a cada frase
+  for (const c of FIT) {
+    if (s.scrollHeight <= s.clientHeight) break;
+    root.classList.add(c);
+  }
 }
 
 /* ---------------- Áudio (sintetizado, sem ficheiros) ---------------- */
@@ -394,6 +409,7 @@ let g = null; // jogo em curso
 
 function show(id) {
   $$('.screen').forEach((s) => s.classList.toggle('active', s.id === id));
+  requestAnimationFrame(() => fit()); // depois de o conteúdo novo estar no ecrã
 }
 
 function bestKey() { return `best:${state.op}:${state.lvl}`; }
@@ -669,6 +685,10 @@ function init() {
     if (!audio.ctx) return;
     if (document.hidden) audio.ctx.suspend(); else audio.ctx.resume();
   });
+
+  fit();
+  if (document.fonts) document.fonts.ready.then(() => fit());
+  window.addEventListener('resize', () => fit());
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
